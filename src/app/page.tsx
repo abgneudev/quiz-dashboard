@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase';
 import { Response } from '@/types/database';
 import ResponseCard from '@/components/ResponseCard';
 import StatsCard from '@/components/StatsCard';
+import MultiSelectDropdown from '@/components/MultiSelectDropdown';
+import { getPersonalityEmoji } from '@/utils/personalityUtils';
 import styles from './page.module.css';
 
 async function getResponses(): Promise<Response[]> {
@@ -37,7 +39,8 @@ async function getResponses(): Promise<Response[]> {
 export default function Home() {
   const [allResponses, setAllResponses] = useState<Response[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedType, setSelectedType] = useState('');
+  // support multiple selected types (empty array = all types)
+  const [selectedTypes, setSelectedTypes] = useState<number[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Shared fetch function so the page can refresh on demand
@@ -59,8 +62,8 @@ export default function Home() {
   // Filter responses based on search term and type
   const filteredResponses = useMemo(() => {
     return allResponses.filter((response) => {
-      // Filter by personality type
-      if (selectedType && response.personality_result !== parseInt(selectedType)) {
+      // Filter by personality type(s) - selectedTypes empty = no filter
+      if (selectedTypes.length > 0 && !selectedTypes.includes(response.personality_result)) {
         return false;
       }
 
@@ -76,7 +79,7 @@ export default function Home() {
 
       return true;
     });
-  }, [allResponses, searchTerm, selectedType]);
+  }, [allResponses, searchTerm, selectedTypes]);
 
   // Calculate personality type counts from filtered responses
   const personalityCounts = useMemo(() => {
@@ -90,12 +93,13 @@ export default function Home() {
   const total = filteredResponses.length;
 
   // map counts into an array with consistent ordering and colors/emojis
+  // map categories to counts and get the official emoji from personalityUtils
   const categories = [
-    { key: 'The Quiet Observer', color: '#4caf50', emoji: '🤫' },
-    { key: 'The Action Driver', color: 'var(--primary-red)', emoji: '⚡' },
-    { key: 'The Imaginative Dreamer', color: '#f57f17', emoji: '🌟' },
-    { key: 'The Social Connector', color: '#2196f3', emoji: '🤝' }
-  ].map((c) => ({ ...c, count: personalityCounts[c.key] || 0 }));
+    { key: 'The Quiet Observer', id: 1, color: '#4caf50' },
+    { key: 'The Action Driver', id: 2, color: 'var(--primary-red)' },
+    { key: 'The Imaginative Dreamer', id: 3, color: '#f57f17' },
+    { key: 'The Social Connector', id: 4, color: '#2196f3' }
+  ].map((c) => ({ ...c, count: personalityCounts[c.key] || 0, emoji: getPersonalityEmoji(c.id) }));
 
   return (
     <main className={styles.container}>
@@ -109,8 +113,8 @@ export default function Home() {
         <div className={styles.headerContent}>
           <div className={styles.metricsAndFilters}>
             <div className={styles.totalBlock}>
-              <div className={styles.totalLabel}>Total Responses</div>
               <div className={styles.totalValue}>{total}</div>
+              <div className={styles.totalLabel}>Total Responses</div>
             </div>
 
             <div className={styles.breakdownGrid}>
@@ -121,35 +125,28 @@ export default function Home() {
           </div>
 
           <div className={styles.headerControls}>
-            <div className={styles.summaryStats}>
-              {/* Keep the compact summary for quick glance (accessible on wider screens) */}
-              {categories.map((c) => (
-                <div key={c.key} className={styles.summaryColumn}>
-                  <div className={styles.summaryValue}>{c.count}</div>
-                  <div className={styles.summaryLabel}>{c.key}</div>
-                </div>
-              ))}
-            </div>
+            {/* headerControls reserved for filters / actions — removed the old numeric summaries as requested */}
           </div>
         </div>
       </header>
 
       <div className={styles.filterBar}>
         <div className={styles.filters}>
-          <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Type:</label>
-            <select
-              className={styles.filterSelect}
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            >
-              <option value="">All Types</option>
-              <option value="1">The Quiet Observer</option>
-              <option value="2">The Action Driver</option>
-              <option value="3">The Imaginative Dreamer</option>
-              <option value="4">The Social Connector</option>
-            </select>
-          </div>
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>Types:</label>
+                <div>
+                  <MultiSelectDropdown
+                    options={[
+                      { id: 1, label: 'The Quiet Observer' },
+                      { id: 2, label: 'The Action Driver' },
+                      { id: 3, label: 'The Imaginative Dreamer' },
+                      { id: 4, label: 'The Social Connector' }
+                    ]}
+                    selected={selectedTypes}
+                    onChange={(arr: number[]) => setSelectedTypes(arr)}
+                  />
+                </div>
+              </div>
 
           <div className={styles.filterGroup}>
             <label className={styles.filterLabel}>Search:</label>

@@ -30,17 +30,34 @@
   justify-content: center;
   color: white;
   font-size: 18px;
+  position: relative;
+  overflow: visible;
+}
+
+.icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--icon-bg, var(--primary-red));
+  opacity: 0.12; /* reduced opacity background */
+  z-index: 0;
+}
+
+.iconContent {
+  position: relative;
+  z-index: 1;
 }
 
 .meta {
   display: flex;
   flex-direction: column;
 }
-
 .count {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: var(--font-weight-bold);
   color: var(--text-primary);
+  line-height: 1;
 }
 
 .label {
@@ -50,24 +67,9 @@
 
 .percent {
   margin-left: auto;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
   font-weight: var(--font-weight-semibold);
-}
-
-.progress {
-  width: 100%;
-  height: 8px;
-  background: var(--card-background);
-  border-radius: 999px;
-  border: 1px solid var(--card-border);
-  overflow: hidden;
-}
-
-.progressBar {
-  height: 100%;
-  border-radius: 999px;
-  transition: width var(--transition-normal), background var(--transition-normal);
 }
 
 @media (max-width: 768px) {

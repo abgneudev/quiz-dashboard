@@ -1,0 +1,40 @@
+.container {
+  position: relative;
+  display: inline-block;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid var(--card-border);
+  background: var(--card-background);
+  border-radius: var(--radius-none);
+  cursor: pointer;
+}
+
+.controlLabel {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.caret { color: var(--text-tertiary); font-size: 12px }
+
+.menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 200px;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  z-index: 40;
+}
+
+.option { padding: 6px 4px; }
+.option label { display:flex; gap:8px; align-items:center; cursor:pointer }
+.option input[type="checkbox"] { transform: scale(1.05); }
+.optionLabel { font-size: 13px; color: var(--text-primary); }
