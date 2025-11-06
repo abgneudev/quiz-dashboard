@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Response } from '@/types/database';
 import ResponseCard from '@/components/ResponseCard';
+import StatsCard from '@/components/StatsCard';
 import styles from './page.module.css';
 
 async function getResponses(): Promise<Response[]> {
@@ -86,6 +87,16 @@ export default function Home() {
     }, {} as Record<string, number>);
   }, [filteredResponses]);
 
+  const total = filteredResponses.length;
+
+  // map counts into an array with consistent ordering and colors/emojis
+  const categories = [
+    { key: 'The Quiet Observer', color: '#4caf50', emoji: '🤫' },
+    { key: 'The Action Driver', color: 'var(--primary-red)', emoji: '⚡' },
+    { key: 'The Imaginative Dreamer', color: '#f57f17', emoji: '🌟' },
+    { key: 'The Social Connector', color: '#2196f3', emoji: '🤝' }
+  ].map((c) => ({ ...c, count: personalityCounts[c.key] || 0 }));
+
   return (
     <main className={styles.container}>
       <header className={styles.header}>
@@ -94,18 +105,31 @@ export default function Home() {
           <span className={styles.breadcrumbSeparator}>{'>'}</span>
           <span>Quiz Responses</span>
         </div>
+
         <div className={styles.headerContent}>
-          <div className={styles.summaryStats}>
-            <div className={styles.summaryColumn}>
-              <div className={styles.summaryValue}>{filteredResponses.length}</div>
-              <div className={styles.summaryLabel}>Total</div>
+          <div className={styles.metricsAndFilters}>
+            <div className={styles.totalBlock}>
+              <div className={styles.totalLabel}>Total Responses</div>
+              <div className={styles.totalValue}>{total}</div>
             </div>
-            {Object.entries(personalityCounts).map(([type, count]) => (
-              <div key={type} className={styles.summaryColumn}>
-                <div className={styles.summaryValue}>{count}</div>
-                <div className={styles.summaryLabel}>{type}</div>
-              </div>
-            ))}
+
+            <div className={styles.breakdownGrid}>
+              {categories.map((c) => (
+                <StatsCard key={c.key} label={c.key} count={c.count} total={total} color={c.color} emoji={c.emoji} />
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.headerControls}>
+            <div className={styles.summaryStats}>
+              {/* Keep the compact summary for quick glance (accessible on wider screens) */}
+              {categories.map((c) => (
+                <div key={c.key} className={styles.summaryColumn}>
+                  <div className={styles.summaryValue}>{c.count}</div>
+                  <div className={styles.summaryLabel}>{c.key}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </header>
