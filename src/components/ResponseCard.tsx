@@ -52,6 +52,24 @@ export default function ResponseCard({ response }: ResponseCardProps) {
         {personalityTypeName}
       </div>
 
+      {/* Legacy single review_comments field (keeps backwards compatibility) */}
+      {response.review_comments && (
+        <div className={styles.reviewComments}>
+          {response.review_comments}
+        </div>
+      )}
+
+      {/* Related reviews from the `reviews` table (one-to-many) */}
+      {response.reviews && response.reviews.length > 0 && (
+        <div className={styles.reviewList}>
+          {response.reviews.map((r) => (
+            <div key={r.id} className={styles.reviewText}>
+              {r.review_text}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className={styles.email}>{response.email}</div>
     </div>
   );

@@ -4,6 +4,13 @@ export interface PersonalityType {
   description: string;
 }
 
+export interface Review {
+  id: string;
+  response_id: string;
+  review_text: string;
+  created_at: string;
+}
+
 export interface Response {
   id: string;
   email: string;
@@ -18,5 +25,7 @@ export interface Response {
   q8: string;
   personality_result: number;
   created_at: string;
+  review_comments?: string;
+  reviews?: Review[];
   personality_types?: PersonalityType;
 }

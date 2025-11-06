@@ -15,6 +15,12 @@ async function getResponses(): Promise<Response[]> {
         id,
         name,
         description
+      ),
+      reviews (
+        id,
+        review_text,
+        created_at,
+        response_id
       )
     `)
     .order('created_at', { ascending: false });
@@ -31,13 +37,21 @@ export default function Home() {
   const [allResponses, setAllResponses] = useState<Response[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Fetch data on client side
-  useEffect(() => {
-    const fetchResponses = async () => {
+  // Shared fetch function so the page can refresh on demand
+  const fetchResponses = async () => {
+    try {
+      setIsRefreshing(true);
       const responses = await getResponses();
       setAllResponses(responses);
-    };
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  // Fetch data on client side (initial load)
+  useEffect(() => {
     fetchResponses();
   }, []);
 
@@ -126,8 +140,13 @@ export default function Home() {
         </div>
 
         <div className={styles.filterActions}>
-          <button className={styles.iconButton} title="Refresh">
-            ↻
+          <button
+            className={styles.iconButton}
+            title={isRefreshing ? 'Refreshing…' : 'Refresh'}
+            onClick={fetchResponses}
+            disabled={isRefreshing}
+          >
+            {isRefreshing ? '⏳' : '↻'}
           </button>
           <button className={styles.iconButton} title="Export">
             ⤓

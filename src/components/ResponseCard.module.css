@@ -6,7 +6,7 @@
   transition: all var(--transition-normal);
   position: relative;
   cursor: pointer;
-  min-height: 160px;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
 }
@@ -87,6 +87,27 @@
 .emoji {
   font-size: 16px;
   line-height: 1;
+}
+
+.reviewComments {
+  font-size: var(--font-size-sm);
+  color: #777;
+  line-height: 1.5;
+  margin-bottom: var(--spacing-sm);
+  font-style: italic;
+}
+
+.reviewList {
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.reviewText {
+  font-size: var(--font-size-sm);
+  color: #777;
+  line-height: 1.4;
 }
 
 .email {
