@@ -1,66 +1,173 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Response } from '@/types/database';
+import ResponseCard from '@/components/ResponseCard';
+import styles from './page.module.css';
+
+async function getResponses(): Promise<Response[]> {
+  const { data, error } = await supabase
+    .from('responses')
+    .select(`
+      *,
+      personality_types (
+        id,
+        name,
+        description
+      )
+    `)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching responses:', error);
+    return [];
+  }
+
+  return data || [];
+}
 
 export default function Home() {
+  const [allResponses, setAllResponses] = useState<Response[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+
+  // Fetch data on client side
+  useEffect(() => {
+    const fetchResponses = async () => {
+      const responses = await getResponses();
+      setAllResponses(responses);
+    };
+    fetchResponses();
+  }, []);
+
+  // Filter responses based on search term and type
+  const filteredResponses = useMemo(() => {
+    return allResponses.filter((response) => {
+      // Filter by personality type
+      if (selectedType && response.personality_result !== parseInt(selectedType)) {
+        return false;
+      }
+
+      // Filter by search term (name or email)
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const nameMatch = response.name.toLowerCase().includes(searchLower);
+        const emailMatch = response.email.toLowerCase().includes(searchLower);
+        if (!nameMatch && !emailMatch) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [allResponses, searchTerm, selectedType]);
+
+  // Calculate personality type counts from filtered responses
+  const personalityCounts = useMemo(() => {
+    return filteredResponses.reduce((acc, response) => {
+      const typeName = response.personality_types?.name || 'Unknown';
+      acc[typeName] = (acc[typeName] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+  }, [filteredResponses]);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.breadcrumb}>
+          <a href="#">Dashboard</a>
+          <span className={styles.breadcrumbSeparator}>{'>'}</span>
+          <span>Quiz Responses</span>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        <div className={styles.headerContent}>
+          <div className={styles.summaryStats}>
+            <div className={styles.summaryColumn}>
+              <div className={styles.summaryValue}>{filteredResponses.length}</div>
+              <div className={styles.summaryLabel}>Total</div>
+            </div>
+            {Object.entries(personalityCounts).map(([type, count]) => (
+              <div key={type} className={styles.summaryColumn}>
+                <div className={styles.summaryValue}>{count}</div>
+                <div className={styles.summaryLabel}>{type}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </header>
+
+      <div className={styles.filterBar}>
+        <div className={styles.filters}>
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Type:</label>
+            <select
+              className={styles.filterSelect}
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+            >
+              <option value="">All Types</option>
+              <option value="1">The Quiet Observer</option>
+              <option value="2">The Action Driver</option>
+              <option value="3">The Imaginative Dreamer</option>
+              <option value="4">The Social Connector</option>
+            </select>
+          </div>
+
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Search:</label>
+            <input
+              type="text"
+              className={styles.filterInput}
+              placeholder="Name or email"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
         </div>
-      </main>
-    </div>
+
+        <div className={styles.filterActions}>
+          <button className={styles.iconButton} title="Refresh">
+            ↻
+          </button>
+          <button className={styles.iconButton} title="Export">
+            ⤓
+          </button>
+        </div>
+      </div>
+
+      <div className={styles.mainContent}>
+        {filteredResponses.length === 0 ? (
+          <div className={styles.empty}>
+            No responses found. Adjust your filters or check back later.
+          </div>
+        ) : (
+          <>
+            <div className={styles.grid}>
+              {filteredResponses.map((response) => (
+                <ResponseCard key={response.id} response={response} />
+              ))}
+            </div>
+
+            <div className={styles.pagination}>
+              <div className={styles.paginationInfo}>
+                Showing 1-{Math.min(filteredResponses.length, 12)} of {filteredResponses.length}
+              </div>
+              <div className={styles.paginationControls}>
+                <select className={styles.filterSelect} style={{ minWidth: '120px' }}>
+                  <option>12 per page</option>
+                  <option>24 per page</option>
+                  <option>48 per page</option>
+                </select>
+                <button className={styles.pageButton}>←</button>
+                <button className={`${styles.pageButton} ${styles.active}`}>1</button>
+                <button className={styles.pageButton}>2</button>
+                <button className={styles.pageButton}>3</button>
+                <button className={styles.pageButton}>→</button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </main>
   );
 }

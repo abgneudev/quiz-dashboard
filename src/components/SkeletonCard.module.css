@@ -1,0 +1,82 @@
+.card {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(229, 224, 232, 0.4),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.nameSkeleton {
+  height: 20px;
+  background: var(--card-border);
+  border-radius: 4px;
+  flex: 1;
+  margin-right: var(--spacing-sm);
+}
+
+.badgeSkeleton {
+  width: 40px;
+  height: 40px;
+  background: var(--card-border);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dateSkeleton {
+  width: 80px;
+  height: 14px;
+  background: var(--card-border);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.personalitySkeleton {
+  height: 18px;
+  background: var(--card-border);
+  border-radius: 4px;
+  margin-bottom: var(--spacing-sm);
+  width: 70%;
+}
+
+.emailSkeleton {
+  height: 16px;
+  background: var(--card-border);
+  border-radius: 4px;
+  width: 60%;
+}

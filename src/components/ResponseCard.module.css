@@ -1,0 +1,98 @@
+.card {
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-none);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-normal);
+  position: relative;
+  cursor: pointer;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  background: var(--hover-bg);
+  border-color: var(--primary-red);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.nameSection {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+
+.name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.date {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.personalityBadge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--primary-red-light);
+  color: var(--primary-red);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-none);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--primary-red);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.personalityBadgeQuiet {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #4caf50;
+}
+
+.personalityBadgeSocial {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #2196f3;
+}
+
+.personalityBadgeAction {
+  background: var(--primary-red-light);
+  color: var(--primary-red);
+  border: 1px solid var(--primary-red);
+}
+
+.personalityBadgeImaginative {
+  background: #fffde7;
+  color: #f57f17;
+  border: 1px solid #ff9800;
+}
+
+.emoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.email {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  line-height: 1.5;
+  word-break: break-word;
+  margin-top: auto;
+}
