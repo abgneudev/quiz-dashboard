@@ -117,3 +117,16 @@
   word-break: break-word;
   margin-top: auto;
 }
+
+.reviewRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.reviewLabel {
+  font-size: var(--font-size-sm);
+  color: #444; /* dark grey for review label */
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}

@@ -55,7 +55,8 @@ export default function ResponseCard({ response }: ResponseCardProps) {
       {/* Legacy single review_comments field (keeps backwards compatibility) */}
       {response.review_comments && (
         <div className={styles.reviewComments}>
-          {response.review_comments}
+          <span className={styles.reviewLabel}>Review:</span>
+          <span className={styles.reviewText}>{response.review_comments}</span>
         </div>
       )}
 
@@ -63,8 +64,9 @@ export default function ResponseCard({ response }: ResponseCardProps) {
       {response.reviews && response.reviews.length > 0 && (
         <div className={styles.reviewList}>
           {response.reviews.map((r) => (
-            <div key={r.id} className={styles.reviewText}>
-              {r.review_text}
+            <div key={r.id} className={styles.reviewRow}>
+              <span className={styles.reviewLabel}>Review:</span>
+              <span className={styles.reviewText}>{r.review_text}</span>
             </div>
           ))}
         </div>
